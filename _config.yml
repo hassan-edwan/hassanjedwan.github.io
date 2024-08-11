@@ -1,15 +1,13 @@
 # Site settings
-title: Hi, I'm Dominik.
-description: Dominik Haitz' professional portfolio site
+title: Hi, I'm Hassan.
+description: Hassan Edwan' professional portfolio site
 # baseurl: "/particle" # the subpath of your site, e.g. /blog
 # url: "localhost:3000" # the base hostname & protocol for your site e.g. http://willianjusten.com.br
 
 # User settings
-username: Dominik Haitz
-user_title: Dr.
+username: Hassan Edwan
 user_job_title: Data Scientist
-email: dominik.haitz [at] gmx.de
-twitter_username: d_haitz
-github_username:  dhaitz
+email: hassanjedwan [at] gmail.com
+github_username:  hassan-edwan
 
 exclude: ['package.json', 'src' , 'node_modules']
