@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chess Games Data Analysis Report</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 20px;
+        }
+        h1, h2, h3 {
+            color: #333;
+        }
+        .section {
+            margin-bottom: 20px;
+        }
+        .graph-placeholder {
+            height: 500px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>Data Analysis Report: Chess Games Over 4 Years</h1>
+
+    <div class="section">
+        <h2>Executive Summary</h2>
+        <p>This report provides a comprehensive analysis of chess game moves collected from chess.com archives. The data was initially compiled from several dozen .pgn files, then reformatted and cleaned into a consolidated <b><code>chess_games.csv</code></b> file, which includes all relevant headers: <b><code>Event</code>, <code>Site</code>, <code>Date</code>, <code>Round</code>, <code>White</code>, <code>Black</code>, <code>Result</code>, <code>WhiteElo</code>, <code>BlackElo</code>, <code>TimeControl</code>, <code>EndTime</code>, <code>Termination</code></b>, and <b><code>GameMoves</code></b>.</p>
+        <p>The analysis focuses on evaluating win/loss ratios and visualizing move sequences to compare performance between games as White and Black. Key insights derived from this analysis aim to enhance understanding of game strategies and player performance. The following sections delve into the methodologies used, detailed visualizations, and key findings from the data.</p>
+    </div>    
+
+    <div class="section">
+        <h2>Data Description</h2>
+        <h3>Dataset Overview</h3>
+        <p><strong>Data Source:</strong> The dataset is derived from chess games collected from chess.com archives. Initially formatted into several dozen .pgn files, the data was consolidated and cleaned into a comprehensive <code>chess_games.csv</code> file.</p>
+        <p><strong>Relevant Columns:</strong></p>
+        <ul>
+            <li><code>Event</code>: The name or type of the chess event where the game was played.</li>
+            <li><code>Site</code>: The location or platform where the game took place.</li>
+            <li><code>Date</code>: The date on which the game was played.</li>
+            <li><code>Round</code>: The round number of the event in which the game was played.</li>
+            <li><code>White</code>: The name of the player playing as White.</li>
+            <li><code>Black</code>: The name of the player playing as Black.</li>
+            <li><code>Result</code>: The outcome of the game (e.g., 1-0, 0-1, 1/2-1/2).</li>
+            <li><code>WhiteElo</code>: The Elo rating of the White player at the time of the game.</li>
+            <li><code>BlackElo</code>: The Elo rating of the Black player at the time of the game.</li>
+            <li><code>TimeControl</code>: The time control format used for the game (e.g., classical, rapid, blitz).</li>
+            <li><code>EndTime</code>: The time when the game ended, including the timezone.</li>
+            <li><code>Termination</code>: The method by which the game ended (e.g., checkmate, resignation, draw).</li>
+            <li><code>GameMoves</code>: A sequence of moves made during the game, represented as a string.</li>
+        </ul>
+        <h3>Analysis Goals</h3>
+        <ol>
+            <li><strong>Identify Game Trends Over Time</strong>: Analyze how game trends evolve over time to understand shifts in strategies and player performance.</li>
+            <li><strong>Evaluate Player Performance by Factors</strong>: Assess how player performance varies based on  different factors such as elo rating, time of day, etc.</li>
+            <li><strong>Visualize and Analyze Move Sequences</strong>: Create and examine visual representations of move sequences to discern patterns and strategies when playing as either White and Black.</li>
+        </ol>
+    </div>
+    
+
+    <div class="section">
+        <h2>Detailed Analysis</h2>
+        
+        <h3>1. Game Trends Over Time</h3>
+        <p><strong>Objective</strong>: To analyze and visualize general trends of games played and elo over time.</p>
+        <div class="section">
+            <h2>Methodology</h2>
+            <ul>
+                <li><strong>Define Bin Edges:</strong> Elo ratings were categorized into bins of 100-point intervals. The bin edges were calculated based on the minimum and maximum Elo ratings in the dataset, with an additional buffer to ensure coverage of all values.</li>
+                <li><strong>Bin Elo Ratings:</strong> Elo ratings were assigned to corresponding bins based on their values using the defined edges. This step involves segmenting the Elo ratings into discrete ranges.</li>
+                <li><strong>Calculate Average Win-Loss Ratio:</strong> For each Elo bin, the average win-loss ratio was computed. This was done by grouping the data by Elo bins and calculating the mean win-loss ratio within each bin.</li>
+                <li><strong>Count of Records:</strong> The number of entries (games) within each Elo bin was recorded to understand the distribution of games across different Elo rating ranges.</li>
+                <li><strong>Plot Results:</strong> A line plot with markers was generated to visualize the average win-loss ratio across Elo rating bins. The x-axis represents the Elo rating bin edges, and the y-axis shows the average win-loss ratio. The plot was customized with gridlines and ticks for improved clarity.</li>
+            </ul>            
+        </div>        
+        <p><strong>Findings</strong>:</p>
+        
+        <img src="assets\img\games_over_time.png" alt=" Games Over Time Graph" style="width: 100%; max-width: 800px; height: auto;">
+
+        <p><strong>Statistics summary:</strong></p>
+        <ul>
+            <li>No games were played during 2021, and 2020 saw very limited play except for a significant increase in July and towards the end of the year.</li>
+            <li>Each year exhibits a recurring pattern with noticeable spikes in activity during the Summer and Winter months.</li>
+            <li>When the number of games played spikes, there is generally a proportional increase in Elo rating.</li>
+        </ul>
+
+        <h3>2. Player Performance by Different Factors</h3>
+        <p><strong>Objective</strong>: Assess how player performance varies based on different factors such as Elo rating, time of day, and move sequences.</p>
+
+        <h4>2.1 Performance Based on Elo Rating</h4>
+        <p><strong>Methodology:</strong></p>
+        <ul>
+            <li><strong>Calculate Elo Difference:</strong> Compute the Elo difference between the player's rating and their opponent's rating by subtracting the player's Elo from the opponent's Elo.</li>
+            <li><strong>Map Result to Win-Loss Ratio:</strong> Convert the game results into a win-loss ratio:
+                <ul>
+                    <li>'1-0' is mapped to a ratio of 1 (win).</li>
+                    <li>'0-1' is mapped to a ratio of 0 (loss).</li>
+                    <li>'1/2-1/2' is mapped to a ratio of 0.5 (draw).</li>
+                </ul>
+            </li>
+            <li><strong>Define Bin Edges:</strong> Create bins for the Elo difference with a step size of 25 points to group the data.</li>
+            <li><strong>Bin Elo Differences:</strong> Assign Elo differences to the defined bins for categorization.</li>
+            <li><strong>Filter Valid Bins:</strong> Exclude bins with fewer than 15 games to ensure statistical significance.</li>
+            <li><strong>Calculate Win-Loss Ratio by Bin:</strong> Compute the average win-loss ratio for each valid Elo bin and include the count of games in each bin.</li>
+            <li><strong>Filter Results:</strong> Exclude bins with zero games and edges greater than 500 to focus on relevant and manageable data.</li>
+        </ul>
+
+        <p><strong>Findings</strong>:</p>
+        <img src="assets\img\win_loss_ratio_by_elo.png" alt=" Games Over Time Graph" style="width: 100%; max-width: 808px; height: auto;">
+        <p><strong>Statistics Summary:</strong></p>
+        <ul>
+            <li><strong>Performance Against Better Opponents:</strong> Contrary to my expectations, I perform better against opponents with higher Elo ratings.</li>
+            <li><strong>Performance Against Lower Elo Opponents:</strong> I also perform well against opponents with Elo ratings approximately 25 points below mine.</li>
+            <li><strong>Perfect Bell Curve:</strong> A perfect bell curve by count of elo difference, shows how adept Chess.com is at match making.</li>
+            <li><strong>Unexpected Findings:</strong> The results suggest that I am more adept at handling stronger opponents or opponents very close in rating to me, which could indicate strong adaptability and skill at varying levels of competition.</li>
+        </ul>
+
+        <h4>2.2 Performance Based on Time of Day</h4>
+        <p><strong>Methodology</strong>:</p>
+        <ul>
+            <li><strong>Create New DataFrame:</strong> A new DataFrame, <code>wins_by_time</code>, is created containing only the 'DateTime' column from the original data. This DataFrame will be used to analyze wins and losses by hour.</li>
+            <li><strong>Map Results to Win/Loss:</strong> The 'Result' column is mapped to binary values where '1-0' represents a win (1) and '0-1' represents a loss (1). This allows for quantification of wins and losses.</li>
+            <li><strong>Extract Hour:</strong> The hour is extracted from the 'DateTime' column and added as a new column, 'Hour', in the <code>wins_by_time</code> DataFrame. This facilitates grouping data by hour of the day.</li>
+            <li><strong>Group by Hour:</strong> Data is grouped by hour to count the number of wins and losses for each hour. This step aggregates the total wins and losses occurring during each hour of the day.</li>
+            <li><strong>Calculate Win-Loss Ratio:</strong> The win-loss ratio is computed for each hour by dividing the number of wins by the number of losses. This ratio reflects the performance at different times of the day.</li>
+            <li><strong>Handle Division by Zero:</strong> Any infinite or NaN values in the win-loss ratio data are replaced with NaN to avoid issues with subsequent analysis and visualization.</li>
+            <li><strong>Smooth Data:</strong> The win-loss ratio data is smoothed using cubic spline interpolation to create a continuous curve. This smooth curve helps in identifying trends and patterns more clearly.</li>
+            <li><strong>Plot Results:</strong> Two subplots are generated: 
+                <ul>
+                    <li><strong>Win-Loss Ratio by Hour:</strong> This plot shows the smoothed win-loss ratio curve along with actual data points. A threshold line is added for reference, and the area below the threshold is shaded in red to highlight periods with a win-loss ratio below 1.</li>
+                    <li><strong>Total Wins and Losses by Hour:</strong> This plot shows the total count of wins and losses for each hour, providing a view of overall activity levels throughout the day.</li>
+                </ul>
+            </li>
+        </ul>
+        
+        <p><strong>Findings</strong>:</p>
+
+        <img src="assets\img\win_loss_by_hour.png" alt=" Games Over Time Graph" style="width: 100%; max-width: 800px; height: auto;">
+        
+        <p><strong>Statistics Summary:</strong></p>
+        <ul>
+            <li>Games played show a notable spike around 2 am, which trails off until about 5 am before becoming negligible. This pattern may not accurately reflect my sleep schedule, as games played continue beyond the typical sleep period, suggesting an extended playtime during these hours.</li>
+            <li>The win-loss ratio experiences significant spikes at three key times: 1-3 am, 6 pm, and 10 pm. The spike from 1-3 am occurs when I have no pressing commitments the following day, while the 10 pm spike aligns with a time when I have responsibilities the next day. The 6 pm peak corresponds to a period of free time when I am fully awake and engaged.</li>
+            <li>Each spike in the win-loss ratio is followed by a dip, indicating a decline in performance when continuing to play past these peak times. For instance, playing beyond 1-3 am or 10 pm often results in poorer performance as it encroaches into sleep hours or leads to fatigue. Additionally, there is a noticeable dip a couple of hours after waking up, suggesting reduced performance when groggy.</li>
+            <li>Most of my games are played around 2 am, which aligns with the seasonal spikes observed in the monthly game activity graph, particularly during summer and winter breaks. This period of high activity is linked to my status as an unemployed student with fewer obligations, which is my explanation for the increased gaming during these times. I hope this context is helpful and provides insight into my gaming patterns.</li>
+        </ul>
+
+        <h4>2.3 Performance Based on Season</h4>
+        <p><strong>Methodology</strong>:</p>
+        <ul>
+            <li><strong>Create New DataFrame</strong>: A new DataFrame, <code>wins_by_month</code>, is created containing only the 'DateTime' column from the original data. This DataFrame will be used to analyze wins and losses by month.</li>
+            <li><strong>Map Results to Win/Loss</strong>: The 'Result' column is mapped to binary values where '1-0' represents a win (1) and '0-1' represents a loss (1). This allows for quantification of wins and losses.</li>
+            <li><strong>Extract Month</strong>: The month is extracted from the 'DateTime' column and added as a new column, 'Month', in the <code>wins_by_month</code> DataFrame. This facilitates grouping data by month of the year.</li>
+            <li><strong>Group by Month</strong>: Data is grouped by month to count the number of wins and losses for each month. This step aggregates the total wins and losses occurring during each month.</li>
+            <li><strong>Calculate Win-Loss Ratio</strong>: The win-loss ratio is computed for each month by dividing the number of wins by the number of losses. This ratio reflects performance at different times of the year.</li>
+            <li><strong>Handle Division by Zero</strong>: Any infinite or NaN values in the win-loss ratio data are replaced with NaN to avoid issues with subsequent analysis and visualization.</li>
+            <li><strong>Smooth Data</strong>: The win-loss ratio data is smoothed using cubic spline interpolation to create a continuous curve. This smooth curve helps in identifying trends and patterns more clearly.</li>
+            <li><strong>Plot Results</strong>: Two subplots are generated:
+                <ul>
+                    <li><strong>Win-Loss Ratio by Month</strong>: This plot shows the smoothed win-loss ratio curve along with actual data points. A threshold line is added for reference, and the area below the threshold is shaded in red to highlight periods with a win-loss ratio below 1.</li>
+                    <li><strong>Total Wins and Losses by Month</strong>: This plot shows the total count of wins and losses for each month, providing a view of overall activity levels throughout the year.</li>
+                </ul>
+            </li>
+        </ul>
+        <p><strong>Findings</strong>:</p>
+        
+        <img src="assets\img\win_loss_by_month.png" alt=" Games Over Time Graph" style="width: 100%; max-width: 800px; height: auto;">
+
+        <p><strong>Statistics Summary:</strong></p>
+        <ul>
+            <li><strong>Playing Patterns:</strong> I play most of my games during the summer, from late May to early August, and in the winter, from November to January. I play very little in the fall and spring, with the fall seeing even less activity than the spring. This shows my ability to focus and perform well during specific periods of the year.</li>
+            <li><strong>Win-Loss Ratio:</strong> The win-loss ratio is notably low and even dips into negative values during the winter months. This aligns with my experience of seasonal depression, which likely impacts my performance. </li>
+            <li><strong>October Spike:</strong> The spike in October reflects a transition from playing very few games to playing a significantly higher number. Around the time where I start getting off the rust built up from the previous two months.</li>
+        </ul>
+
+        <h4>2.4 Performance Based on Session Length</h4>
+        <p><strong>Methodology:</strong></p>
+        <ul>
+            <li><strong>Create New DataFrame:</strong> A new DataFrame, <code>wins_by_time</code>, is created from the 'DateTime' column of the original data to focus on the timing of games.</li>
+            <li><strong>Map Results to Win/Loss:</strong> The 'Result' column is mapped to binary values where '1-0' represents a win (1) and '0-1' represents a loss (1). This transformation quantifies wins and losses for analysis.</li>
+            <li><strong>Sort by Time:</strong> The DataFrame is sorted by 'DateTime' to ensure chronological order of games.</li>
+            <li><strong>Calculate Time Difference:</strong> The time difference between consecutive games is calculated to determine intervals and session boundaries.</li>
+            <li><strong>Define Session Threshold:</strong> A session threshold is set (e.g., 20 minutes) to define sessions based on time gaps between games.</li>
+            <li><strong>Assign Session IDs:</strong> Sessions are assigned unique IDs based on the defined threshold, grouping consecutive games within the threshold into the same session.</li>
+            <li><strong>Calculate Session Lengths:</strong> The length of each session (i.e., the number of games within each session) is calculated.</li>
+            <li><strong>Merge Session Lengths:</strong> The session lengths are merged back into the original DataFrame to associate session information with each game.</li>
+            <li><strong>Group and Aggregate Data:</strong> Data is grouped by session length to aggregate wins and losses, and compute the win-loss ratio for each session length.</li>
+            <li><strong>Plot Results:</strong> Two plots are generated:
+                <ul>
+                    <li><strong>Win-Loss Ratio by Length of Session:</strong> Shows the win-loss ratio for each session length with a horizontal threshold line at y=1 to indicate a neutral win-loss ratio.</li>
+                    <li><strong>Total Wins and Losses by Length of Session:</strong> Displays the total count of wins and losses for each session length to visualize overall activity levels.</li>
+                </ul>
+            </li>
+        </ul>
+
+        <p><strong>Findings</strong>:</p>
+        
+        <img src="assets\img\win_loss_by_session_length.png" alt=" Games Over Time Graph" style="width: 100%; max-width: 800px; height: auto;">
+
+        <p><strong>Statistics Summary:</strong></p>
+        <ul>
+            <li><strong>One Game Sessions:</strong> Sessions with only one game played have a negative win rate. This suggests that being mentally prepared for multiple games in a session can improve performance.</li>
+            <li><strong>Sessions of 2-10 Games:</strong>
+                <ul>
+                    <li><strong>Positive Win Rate:</strong> Sessions with 2 to 10 games played show a positive win rate.</li>
+                    <li><strong>Peak Performance:</strong> The highest win rate is observed in sessions with 6 games played. This indicates an optimal session length for better performance.</li>
+                </ul>
+            </li>
+            <li><strong>Longer Sessions (7-8 Games and Beyond):</strong>
+                <ul>
+                    <li><strong>Negligible Frequency:</strong> Sessions with more than 7-8 games are rare and have a minimal impact on overall performance analysis.</li>
+                    <li><strong>Extended Sessions:</strong> An extreme case of 37 games in one session had a positive win-loss ratio, although it raises concerns about mental and physical health during extended play.</li>
+                </ul>
+            </li>
+        </ul>
+
+
+        <h3>3. Game Move Comparison by Player Color</h3>
+        <p><strong>Objective</strong>: To compare Moves when played as White and Black.</p>
+        <p><strong>Methodology:</strong></p>
+        <ul>
+            <li><strong>Create New DataFrame:</strong> A new DataFrame, <code>wins_by_moves</code>, is created from the relevant columns of the original data, focusing on game moves and player color.</li>
+            <li><strong>Calculate Number of Moves:</strong> The number of moves in each game is calculated and binned into categories (e.g., 5 moves, 10 moves) using <code>pd.cut</code> to facilitate analysis by move count.</li>
+            <li><strong>Filter and Limit Game Moves:</strong> For each player color (e.g., White and Black) and each move bin (e.g., 5 moves, 10 moves), filter the DataFrame to include only games with the specified number of moves. Limit the sequences to the first few moves (e.g., 10 moves) and convert the moves into tuples for consistency.</li>
+            <li><strong>Count Move Sequences:</strong> Count the frequency of each unique move sequence for the specified player color and move bin. Filter out sequences with counts below a threshold (e.g., 10 games).</li>
+            <li><strong>Update Game Moves for Sankey Diagram:</strong> Add numerical prefixes to each move sequence to represent move order and include all previous moves to create comprehensive paths for the Sankey diagram.</li>
+            <li><strong>Initialize Nodes and Links:</strong> Extract unique nodes (move sequences) and links (transitions between moves). Create a mapping of nodes to indices and a dictionary to track the paths between nodes.</li>
+            <li><strong>Extract Node Labels:</strong> Generate labels for each node by extracting a representative segment from the move sequence (e.g., the last move in the sequence) for clarity in the diagram.</li>
+            <li><strong>Create Source-Target Pairs:</strong> Generate lists of source and target indices along with their frequencies to define the links in the Sankey diagram.</li>
+            <li><strong>Create Sankey Diagram:</strong> Use a plotting library (e.g., Plotly) to create the Sankey diagram, including nodes and links with the generated indices and values.</li>
+            <li><strong>Customize and Display:</strong> Customize the appearance of the Sankey diagram (e.g., node padding, thickness) and add a title. Display the Sankey diagram using appropriate visualization functions.</li>
+        </ul>
+
+        <p><strong>Findings</strong>:</p>
+
+        <img src="assets\img\Sankey Diagram as Black 10 moves.png" alt=" Games Over Time Graph" style="width: 100%; max-width: 800px; height: auto;">
+        <img src="assets\img\Sankey Diagram as White 10 moves.png" alt=" Games Over Time Graph" style="width: 100%; max-width: 800px; height: auto;">
+        <img src="assets\img\Sankey Diagram as Black 5 moves.png" alt=" Games Over Time Graph" style="width: 100%; max-width: 800px; height: auto;">
+        <img src="assets\img\Sankey Diagram as White 5 moves.png" alt=" Games Over Time Graph" style="width: 100%; max-width: 800px; height: auto;">
+
+            <p><strong>Statistics Summary:</strong></p>
+    <ul>
+        <li><strong>Game Moves as White (Up to 10 Moves, All Even Moves are Mine):</strong>
+            <ul>
+                <li><strong>Main Branch Consistency:</strong> My games as White primarily follow the same sequence of 9 moves before branching off. This main branch represents a Scotch Game, which is a commonly played opening offering White a slight advantage.</li>
+                <li><strong>Branching Behavior:</strong> The significant branching occurs at move 7, indicating a strategic preference to deviate when advantageous, demonstrating flexibility in my opening repertoire.</li>
+            </ul>
+        </li>
+        <li><strong>Game Moves as Black (Up to 10 Moves, All Odd Moves are Mine):</strong>
+            <ul>
+                <li><strong>Sicilian Defense Consistency:</strong> When playing the Sicilian Defense as Black, my moves follow a consistent path up to move 9, after which the main branch splits into two significant lines. This indicates a strong understanding and preference for the Sicilian Defense opening.</li>
+                <li><strong>Branching Dynamics:</strong> I branch off from the main path rather than my opponent, with 6 paths played more than 10 times up to 10 moves, showing proactive influence on the game’s direction.</li>
+            </ul>
+        </li>
+        <li><strong>Game Moves as Black and White (Up to 5 Moves):</strong>
+            <ul>
+                <li><strong>Branching Frequency:</strong> In games up to 5 moves, the trend of branching is less pronounced, but I still branch off more frequently than my opponents by nearly double at each branching point. This suggests a tendency to explore alternative strategies early in the game.</li>
+            </ul>
+        </li>
+    </ul>
+        
+    </div>
+
+    <div class="section">
+        <h2>Conclusion</h2>
+        <p>The comprehensive analysis of chess games over a four-year period offers profound insights into various aspects of player performance and game strategies. By examining trends over time, performance based on Elo ratings, time of day, seasonal patterns, session lengths, and move sequences, the study reveals several key findings:</p>
+        <ul>
+            <li><strong>Game Trends Over Time:</strong> Activity levels exhibit notable patterns with seasonal peaks in summer and winter. Elo ratings show significant correlations with these trends, highlighting periods of increased competition and performance.</li>
+            <li><strong>Performance by Elo Rating:</strong> The analysis uncovers unexpected findings about performance against higher and lower-rated opponents, indicating a high adaptability and effectiveness in varied competitive settings.</li>
+            <li><strong>Time of Day:</strong> Performance varies significantly based on the time of day, with peak performance observed during specific hours. The data suggests a correlation between optimal play times and overall game outcomes.</li>
+            <li><strong>Seasonal Patterns:</strong> Seasonal fluctuations impact game activity and performance, with noticeable declines during winter months, potentially linked to seasonal mood changes.</li>
+            <li><strong>Session Lengths:</strong> Optimal performance is associated with sessions of moderate length (2-10 games), with longer sessions potentially impacting performance negatively.</li>
+        </ul>
+        <p>These insights highlight critical areas where players can refine their strategies and adapt their gameplay to improve outcomes and overall performance.</p>
+    </div>
+    
+    <div class="section">
+        <h2>Recommendations</h2>
+        <ul>
+            <li><strong>Strategic Adjustments:</strong> 
+                <ul>
+                    <li><strong>Timing:</strong> Align game sessions with identified peak performance periods, avoiding extended play beyond optimal hours to maintain high performance levels.</li>
+                    <li><strong>Session Length:</strong> Aim for moderate session lengths (2-10 games) to maximize performance, while avoiding excessively long sessions that may lead to fatigue.</li>
+                    <li><strong>Adaptability:</strong> Develop strategies that leverage strengths against different Elo ratings, focusing on adaptability and tactical flexibility.</li>
+                </ul>
+            </li>
+            <li><strong>Further Research:</strong> 
+                <ul>
+                    <li><strong>Specific Openings:</strong> Investigate the effectiveness of various chess openings and their impact on win rates, particularly focusing on frequently used strategies.</li>
+                    <li><strong>Advanced Move Sequences:</strong> Analyze advanced move sequences and their influence on game outcomes to understand deeper strategic implications.</li>
+                </ul>
+            </li>
+            <li><strong>Enhanced Data Collection:</strong> 
+                <ul>
+                    <li><strong>Detailed Profiles:</strong> Collect more granular data on player profiles and game contexts to gain deeper insights into performance factors and strategy effectiveness.</li>
+                    <li><strong>Expanded Variables:</strong> Include additional variables such as opponent behavior and game-specific conditions to enrich the analysis.</li>
+                </ul>
+            </li>
+        </ul>
+    </div>
+    
+    <div class="section">
+        <h2>Future Work</h2>
+        <ul>
+            <li><strong>Expanded Analysis:</strong> 
+                <ul>
+                    <li><strong>Move Sequence Impact:</strong> Conduct detailed analyses of specific move sequences, evaluating their impact across different game phases and levels of play.</li>
+                    <li><strong>Game Phases:</strong> Explore how different phases of the game (opening, middlegame, endgame) are influenced by move sequences and player strategies.</li>
+                </ul>
+            </li>
+            <li><strong>Advanced Visualizations:</strong> 
+                <ul>
+                    <li><strong>Intricate Tools:</strong> Develop advanced visual tools to capture nuanced trends and strategies, providing a more detailed understanding of game dynamics.</li>
+                    <li><strong>Interactive Visualizations:</strong> Create interactive visualizations to allow users to explore and manipulate data for personalized insights and deeper analysis.</li>
+                </ul>
+            </li>
+        </ul>
+    </div>
+    
+
+</body>
+</html>
